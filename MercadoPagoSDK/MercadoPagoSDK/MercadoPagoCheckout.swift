@@ -515,6 +515,7 @@ open class MercadoPagoCheckout: NSObject {
     
     private func pushViewController(viewController: UIViewController,
                                    animated: Bool) {
+        viewController.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: animated)
     }
     
