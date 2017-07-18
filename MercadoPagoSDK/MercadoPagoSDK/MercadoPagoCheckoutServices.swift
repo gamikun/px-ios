@@ -63,13 +63,13 @@ extension MercadoPagoCheckout {
         MPServicesBuilder.searchPaymentMethods(self.viewModel.getFinalAmount(), defaultPaymenMethodId: self.viewModel.getDefaultPaymentMethodId(), excludedPaymentTypeIds: self.viewModel.getExcludedPaymentTypesIds(), excludedPaymentMethodIds: self.viewModel.getExcludedPaymentMethodsIds(),
                                                baseURL: MercadoPagoCheckoutViewModel.servicePreference.getDefaultBaseURL(), success: {  [weak self](paymentMethodSearchResponse: PaymentMethodSearch) -> Void in
 
-                                                guard let strongSelf = self else {
-                                                    return
-                                                }
+            guard let strongSelf = self else {
+                return
+            }
 
-                                                strongSelf.viewModel.updateCheckoutModel(paymentMethodSearch: paymentMethodSearchResponse)
-                                                strongSelf.dismissLoading()
-                                                strongSelf.executeNextStep()
+            strongSelf.viewModel.updateCheckoutModel(paymentMethodSearch: paymentMethodSearchResponse)
+            strongSelf.dismissLoading()
+            strongSelf.executeNextStep()
 
             }, failure: { [weak self] (error) -> Void in
                 guard let strongSelf = self else {
@@ -112,7 +112,6 @@ extension MercadoPagoCheckout {
             })
             strongSelf.executeNextStep()
         }
-
     }
 
     func createCardToken(cardInformation: CardInformation? = nil, securityCode: String? = nil) {
@@ -225,21 +224,17 @@ extension MercadoPagoCheckout {
                 }
                 let mpError = MPSDKError.convertFrom(error)
 
-                if let apiException = mpError.apiException {
-
-                    if apiException.containsCause(code: ApiUtil.ErrorCauseCodes.INVALID_ESC.rawValue) ||  apiException.containsCause(code: ApiUtil.ErrorCauseCodes.INVALID_FINGERPRINT.rawValue) {
-                        strongSelf.viewModel.esc = nil
-                    }
+                if let apiException = mpError.apiException, apiException.containsCause(code: ApiUtil.ErrorCauseCodes.INVALID_ESC.rawValue) ||  apiException.containsCause(code: ApiUtil.ErrorCauseCodes.INVALID_FINGERPRINT.rawValue) {
+                    strongSelf.viewModel.esc = nil
                 } else {
-
                     strongSelf.viewModel.errorInputs(error: mpError, errorCallback: { [weak self] (_) in
                         self?.createSavedESCCardToken(savedESCCardToken: savedESCCardToken)
                     })
+
                 }
                 strongSelf.dismissLoading()
                 strongSelf.executeNextStep()
         })
-
     }
 
     func cloneCardToken(token: Token, securityCode: String) {
@@ -338,5 +333,4 @@ extension MercadoPagoCheckout {
                 strongSelf.executeNextStep()
         })
     }
-
 }

@@ -237,6 +237,8 @@
 		23ECADC61EF1D7E0003E4539 /* ApiUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23ECADC41EF1C7CC003E4539 /* ApiUtil.swift */; };
 		23ECADD21EF1DF66003E4539 /* CustomServerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23ECADD11EF1DF66003E4539 /* CustomServerTest.swift */; };
 		4B077D4B1EB4400E001B0D69 /* PaymentResultContentViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B077D4A1EB4400E001B0D69 /* PaymentResultContentViewTest.swift */; };
+		4B0BAC421F1E81BF0097103E /* MercadoPagoCheckoutServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD84D711F1E48FB002219D4 /* MercadoPagoCheckoutServices.swift */; };
+		4B0BAC431F1E81C60097103E /* MercadoPagoCheckoutScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD84D731F1E4910002219D4 /* MercadoPagoCheckoutScreens.swift */; };
 		4B277F661E38DD7700AF5DF8 /* NSDictionary+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B277F651E38DD7700AF5DF8 /* NSDictionary+Additions.swift */; };
 		4B277F671E38DD7700AF5DF8 /* NSDictionary+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B277F651E38DD7700AF5DF8 /* NSDictionary+Additions.swift */; };
 		4B277F691E38F00D00AF5DF8 /* ServicePreferenceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B277F681E38F00D00AF5DF8 /* ServicePreferenceTest.swift */; };
@@ -2404,6 +2406,7 @@
 				4B53C5F91E4B3FC200D6190A /* NextStepHelper.swift in Sources */,
 				765E7CAF1E736A32003AE4CD /* WalletIntegrationTest.swift in Sources */,
 				0F9883A21AD2AB8000F750F0 /* GatewayService.swift in Sources */,
+				4B0BAC431F1E81C60097103E /* MercadoPagoCheckoutScreens.swift in Sources */,
 				766012E31CEB963300897F9D /* MPSDKError.swift in Sources */,
 				76DDF97B1E8AE8C900EEB66D /* ServicePreference.swift in Sources */,
 				0F9883A61AD2AB8000F750F0 /* CustomService.swift in Sources */,
@@ -2545,6 +2548,7 @@
 				15B8B1C81E71DED10065DF50 /* DiscountService.swift in Sources */,
 				0F9883B61AD2AD0C00F750F0 /* Regex.swift in Sources */,
 				76EC47CA1C85E3C80086FA53 /* CardholderTest.swift in Sources */,
+				4B0BAC421F1E81BF0097103E /* MercadoPagoCheckoutServices.swift in Sources */,
 				15840B8D1F06BF9D00701885 /* Reach.swift in Sources */,
 				4BCDAC3B1E6849EA007ADD46 /* ReviewScreenPreferenceTest.swift in Sources */,
 				C5D27F461EEF289400768C1C /* PaymentVaultViewModel.swift in Sources */,
