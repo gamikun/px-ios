@@ -16,5 +16,7 @@ open class ApiUtil {
     }
     enum ErrorCauseCodes: String {
         case INVALID_IDENTIFICATION_NUMBER = "324"
+        case INVALID_ESC = "E216"
+        case INVALID_FINGERPRINT = "E217"
     }
 }

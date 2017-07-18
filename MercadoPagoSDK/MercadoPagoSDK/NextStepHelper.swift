@@ -7,6 +7,9 @@
 //
 
 import Foundation
+#if MPESC_ENABLE
+    import ESCManager
+#endif
 
 extension MercadoPagoCheckoutViewModel {
 
@@ -60,7 +63,7 @@ extension MercadoPagoCheckoutViewModel {
         guard let holder = self.cardToken?.cardholder else {
             return false
         }
-        
+
         if let identification = holder.identification {
             if String.isNullOrEmpty(identification.number) && pm.isIdentificationRequired() && !option.isCustomerPaymentMethod() {
                 return true
@@ -166,7 +169,7 @@ extension MercadoPagoCheckoutViewModel {
         guard let pmSelected = self.paymentOptionSelected else {
             return false
         }
-        if pmSelected.isCustomerPaymentMethod() && self.paymentData.token == nil && pmSelected.getId() != PaymentTypeId.ACCOUNT_MONEY.rawValue && (self.paymentData.payerCost != nil || !self.paymentData.paymentMethod.isCreditCard()) {
+        if pmSelected.isCustomerPaymentMethod() && self.paymentData.token == nil && pmSelected.getId() != PaymentTypeId.ACCOUNT_MONEY.rawValue && (self.paymentData.payerCost != nil || !self.paymentData.paymentMethod.isCreditCard()) && !hasSavedESC() {
             return true
         }
         return false
@@ -179,7 +182,13 @@ extension MercadoPagoCheckoutViewModel {
         }
         //Note: this is being used only for new cards, saved cards tokenization is
         //made in MercadoPagoCheckout#collectSecurityCode().
-        return self.paymentData.token == nil && pm.isCard() && self.cardToken != nil
+
+        let hasInstallmentsIfNeeded = self.paymentData.payerCost != nil || !self.paymentData.paymentMethod.isCreditCard()
+
+        let newCard = self.paymentData.token == nil && pm.isCard() && self.cardToken != nil
+        let savedCardWithESC = self.paymentData.token == nil && pm.isCard() && hasSavedESC() && hasInstallmentsIfNeeded
+
+        return newCard || savedCardWithESC
     }
 
     func needReviewAndConfirm() -> Bool {
@@ -236,5 +245,46 @@ extension MercadoPagoCheckoutViewModel {
 
     func needValidatePreference() -> Bool {
         return !self.needLoadPreference && !self.preferenceValidated
+    }
+
+    func hasSavedESC() -> Bool {
+        if hasESCEnable() {
+            guard let pmSelected = self.paymentOptionSelected else {
+                return false
+            }
+
+            if !pmSelected.isCustomerPaymentMethod() {
+                return false
+            }
+
+            if let card = pmSelected as? CardInformation {
+                if card.getCardId() == "132797406" {
+                    return esc == nil ? false : true
+                } else {
+                    return false
+                }
+                //return //!String.isNullOrEmpty(ESCManager.getESC(cardId: card.getCardId()))
+            }
+            return false
+
+        } else {
+            return false
+        }
+    }
+
+    func getESC() -> String? {
+        if hasESCEnable() {
+            return esc
+        }
+
+        return nil
+    }
+
+    func hasESCEnable() -> Bool {
+        #if MPESC_ENABLE
+            return MercadoPagoCheckoutViewModel.flowPreference.isESCEnable()
+        #else
+            return false
+        #endif
     }
 }

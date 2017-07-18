@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double Pods_PodTesterUITestsVersionNumber;
-FOUNDATION_EXPORT const unsigned char Pods_PodTesterUITestsVersionString[];
+FOUNDATION_EXPORT double ESCManagerVersionNumber;
+FOUNDATION_EXPORT const unsigned char ESCManagerVersionString[];
 

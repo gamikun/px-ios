@@ -10,10 +10,19 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '8.0'
   s.requires_arc = true
 
-  s.resources = ['MercadoPagoSDK/MercadoPagoSDK/*.xcassets', 'MercadoPagoSDK/MercadoPagoSDK/*.ttf','MercadoPagoSDK/*.plist']
+  s.resources = ['MercadoPagoSDK/MercadoPagoSDK/*.xcassets', 'MercadoPagoSDK/MercadoPagoSDK/*.ttf','MercadoPagoSDK/*.plist', 'MercadoPagoSDK/MercadoPagoSDK/*.lproj']
   s.source_files = ['MercadoPagoSDK/MercadoPagoSDK/*' , 'MercadoPagoSDK/MercadoPagoSDK/Tracker/*']
 
-  #s.dependency 'MercadoPagoTracker'
+  s.subspec 'ESC' do |esc|
+    esc.resources = ['MercadoPagoSDK/MercadoPagoSDK/*.xcassets','MercadoPagoSDK/*.xcassets', 'MercadoPagoSDK/MercadoPagoSDK/*.ttf','MercadoPagoSDK/*.plist', 'MercadoPagoSDK/MercadoPagoSDK/*.lproj']
+    esc.source_files = ['MercadoPagoSDK/MercadoPagoSDK/*' , 'MercadoPagoSDK/MercadoPagoSDK/Tracker/*']
+    esc.dependency 'ESCManager'
+    esc.pod_target_xcconfig = {
+      'OTHER_SWIFT_FLAGS[config=Debug]' => '-D MPESC_ENABLE',
+      'OTHER_SWIFT_FLAGS[config=Release]' => '-D MPESC_ENABLE'
+    }
+
+  end
 
   s.subspec 'Localization' do |t|
     %w|pt es es-MX es-CO en es-PE es-VE es-UY|.map {|localename|

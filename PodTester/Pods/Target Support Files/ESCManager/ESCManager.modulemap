@@ -1,0 +1,6 @@
+framework module ESCManager {
+  umbrella header "ESCManager-umbrella.h"
+
+  export *
+  module * { export * }
+}

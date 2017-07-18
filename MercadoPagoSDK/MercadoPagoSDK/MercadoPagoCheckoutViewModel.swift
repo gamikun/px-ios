@@ -9,62 +9,56 @@
 import UIKit
 
 public enum CheckoutStep: String {
-    case SEARCH_PREFERENCE
-    case SEARCH_DIRECT_DISCOUNT
-    case VALIDATE_PREFERENCE
-    case SEARCH_PAYMENT_METHODS
-    case SEARCH_CUSTOMER_PAYMENT_METHODS
-    case PAYMENT_METHOD_SELECTION
-    case PM_OFF
-    case CARD_FORM
-    case SECURITY_CODE_ONLY
-    case CREDIT_DEBIT
-    case GET_ISSUERS
-    case ISSUERS_SCREEN
-    case CREATE_CARD_TOKEN
-    case IDENTIFICATION
-    case ENTITY_TYPE
-    case GET_FINANCIAL_INSTITUTIONS
-    case GET_PAYER_COSTS
-    case PAYER_COST_SCREEN
-    case REVIEW_AND_CONFIRM
-    case POST_PAYMENT
-    case CONGRATS
-    case FINISH
-    case ERROR
+    case ACTION_FINISH
+    case ACTION_VALIDATE_PREFERENCE
+    case SERVICE_GET_PREFERENCE
+    case SERVICE_GET_DIRECT_DISCOUNT
+    case SERVICE_GET_PAYMENT_METHODS
+    case SERVICE_GET_CUSTOMER_PAYMENT_METHODS
+    case SCREEN_PAYMENT_METHOD_SELECTION
+    case SCREEN_CARD_FORM
+    case SCREEN_SECURITY_CODE
+    case SCREEN_CREDIT_DEBIT
+    case SERVICE_GET_ISSUERS
+    case SCREEN_ISSUERS
+    case SERVICE_CREATE_CARD_TOKEN
+    case SCREEN_IDENTIFICATION
+    case SCREEN_ENTITY_TYPE
+    case SCREEN_FINANCIAL_INSTITUTIONS
+    case SERVICE_GET_PAYER_COSTS
+    case SCREEN_PAYER_COST
+    case SCREEN_REVIEW_AND_CONFIRM
+    case SERVICE_POST_PAYMENT
+    case SCREEN_PAYMENT_RESULT
+    case SCREEN_ERROR
 }
 
 open class MercadoPagoCheckoutViewModel: NSObject {
 
-    internal static var servicePreference = ServicePreference()
-    internal static var decorationPreference = DecorationPreference()
-    internal static var flowPreference = FlowPreference()
+    static var servicePreference = ServicePreference()
+    static var decorationPreference = DecorationPreference()
+    static var flowPreference = FlowPreference()
     var reviewScreenPreference = ReviewScreenPreference()
     var paymentResultScreenPreference = PaymentResultScreenPreference()
-    internal static var paymentDataCallback: ((PaymentData) -> Void)?
-    internal static var paymentDataConfirmCallback: ((PaymentData) -> Void)?
-    internal static var paymentCallback: ((Payment) -> Void)?
+    static var paymentDataCallback: ((PaymentData) -> Void)?
+    static var paymentDataConfirmCallback: ((PaymentData) -> Void)?
+    static var paymentCallback: ((Payment) -> Void)?
     var callbackCancel: (() -> Void)?
-    internal static var changePaymentMethodCallback: (() -> Void)?
+    static var changePaymentMethodCallback: (() -> Void)?
 
     var checkoutPreference: CheckoutPreference!
 
     var paymentMethods: [PaymentMethod]?
-    // card token previo a la tokenización y válido para pago
     var cardToken: CardToken?
-//
     var customerId: String?
 
-    //optionals?
     // Payment methods disponibles en selección de medio de pago
     var paymentMethodOptions: [PaymentMethodOption]?
-    // Payment method seleccionado en selección de medio de pago
     var paymentOptionSelected: PaymentMethodOption?
     // Payment method disponibles correspondientes a las opciones que se muestran en selección de medio de pago
     var availablePaymentMethods: [PaymentMethod]?
 
     var rootPaymentMethodOptions: [PaymentMethodOption]?
-
     var customPaymentOptions: [CardInformation]?
 
     var rootVC = true
@@ -74,7 +68,6 @@ open class MercadoPagoCheckoutViewModel: NSObject {
     var payment: Payment?
     var paymentResult: PaymentResult?
 
-    //open var installment: Installment?
     open var payerCosts: [PayerCost]?
     open var issuers: [Issuer]?
     open var entityTypes: [EntityType]?
@@ -82,14 +75,16 @@ open class MercadoPagoCheckoutViewModel: NSObject {
 
     static var error: MPSDKError?
 
-    internal var errorCallback: (() -> Void)?
+    var errorCallback: (() -> Void)?
 
-    internal var needLoadPreference: Bool = false
-    internal var preferenceValidated: Bool = false
-    internal var readyToPay: Bool = false
-    private var checkoutComplete = false
-    internal var initWithPaymentData = false
+    var needLoadPreference: Bool = false
+    var preferenceValidated: Bool = false
+    var readyToPay: Bool = false
+    var initWithPaymentData = false
     var directDiscountSearched = false
+    private var checkoutComplete = false
+
+    public var esc: String? = "111" // sacar esta variable
 
     static internal func clearEnviroment() {
         MercadoPagoCheckoutViewModel.servicePreference = ServicePreference()
@@ -100,7 +95,6 @@ open class MercadoPagoCheckoutViewModel: NSObject {
         MercadoPagoCheckoutViewModel.paymentDataConfirmCallback = nil
         MercadoPagoCheckoutViewModel.paymentCallback = nil
         MercadoPagoCheckoutViewModel.changePaymentMethodCallback = nil
-
     }
 
     init(checkoutPreference: CheckoutPreference, paymentData: PaymentData?, paymentResult: PaymentResult?, discount: DiscountCoupon?) {
@@ -122,7 +116,6 @@ open class MercadoPagoCheckoutViewModel: NSObject {
         }
         self.paymentResult = paymentResult
         if !String.isNullOrEmpty(self.checkoutPreference._id) {
-            // Cargar información de preferencia en caso que tenga id
             needLoadPreference = true
         } else {
             self.paymentData.payer = self.checkoutPreference.getPayer()
@@ -274,94 +267,95 @@ open class MercadoPagoCheckoutViewModel: NSObject {
 
     }
     public func nextStep() -> CheckoutStep {
+
         if hasError() {
-            return .ERROR
+            return .SCREEN_ERROR
         }
-        
+
         if needLoadPreference {
             needLoadPreference = false
-            return .SEARCH_PREFERENCE
+            return .SERVICE_GET_PREFERENCE
         }
         if needToSearchDirectDiscount() {
             self.directDiscountSearched = true
-            return .SEARCH_DIRECT_DISCOUNT
+            return .SERVICE_GET_DIRECT_DISCOUNT
         }
 
         if shouldExitCheckout() {
-            return .FINISH
+            return .ACTION_FINISH
         }
 
         if shouldShowCongrats() {
-            return .CONGRATS
+            return .SCREEN_PAYMENT_RESULT
         }
 
         if needValidatePreference() {
             preferenceValidated = true
-            return .VALIDATE_PREFERENCE
+            return .ACTION_VALIDATE_PREFERENCE
         }
 
         if needSearch() {
-            return .SEARCH_PAYMENT_METHODS
+            return .SERVICE_GET_PAYMENT_METHODS
         }
 
         if !isPaymentTypeSelected() {
-            return .PAYMENT_METHOD_SELECTION
+            return .SCREEN_PAYMENT_METHOD_SELECTION
         }
 
         if readyToPay {
             readyToPay = false
-            return .POST_PAYMENT
+            return .SERVICE_POST_PAYMENT
         }
 
         if needReviewAndConfirm() {
-            return .REVIEW_AND_CONFIRM
+            return .SCREEN_REVIEW_AND_CONFIRM
         }
 
         if needCompleteCard() {
-            return .CARD_FORM
+            return .SCREEN_CARD_FORM
         }
 
         if needGetIdentification() {
-            return .IDENTIFICATION
+            return .SCREEN_IDENTIFICATION
         }
 
         if needSecurityCode() {
-            return .SECURITY_CODE_ONLY
+            return .SCREEN_SECURITY_CODE
         }
 
         if needCreateToken() {
-            return .CREATE_CARD_TOKEN
+            return .SERVICE_CREATE_CARD_TOKEN
         }
 
         if needGetEntityTypes() {
-            return .ENTITY_TYPE
+            return .SCREEN_ENTITY_TYPE
         }
 
         if needSelectCreditDebit() {
-            return .CREDIT_DEBIT
+            return .SCREEN_CREDIT_DEBIT
         }
 
         if needGetFinancialInstitutions() {
-            return .GET_FINANCIAL_INSTITUTIONS
+            return .SCREEN_FINANCIAL_INSTITUTIONS
         }
 
         if needGetIssuers() {
-            return .GET_ISSUERS
+            return .SERVICE_GET_ISSUERS
         }
 
         if needIssuerSelectionScreen() {
-            return .ISSUERS_SCREEN
+            return .SCREEN_ISSUERS
         }
 
         if needChosePayerCost() {
-            return .GET_PAYER_COSTS
+            return .SERVICE_GET_PAYER_COSTS
         }
 
         if needPayerCostSelectionScreen() {
-            return .PAYER_COST_SCREEN
+            return .SCREEN_PAYER_COST
         }
 
-        return .FINISH
+        return .ACTION_FINISH
 
     }
 
