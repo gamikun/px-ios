@@ -82,6 +82,7 @@ open class MercadoPagoCheckoutViewModel: NSObject {
     var readyToPay: Bool = false
     var initWithPaymentData = false
     var directDiscountSearched = false
+    var savedESCCardToken: SavedESCCardToken?
     private var checkoutComplete = false
 
     public var esc: String? = "111" // sacar esta variable
@@ -98,6 +99,7 @@ open class MercadoPagoCheckoutViewModel: NSObject {
     }
 
     init(checkoutPreference: CheckoutPreference, paymentData: PaymentData?, paymentResult: PaymentResult?, discount: DiscountCoupon?) {
+        super.init()
         self.checkoutPreference = checkoutPreference
         if let pm = paymentData {
             if pm.isComplete() {
@@ -105,6 +107,8 @@ open class MercadoPagoCheckoutViewModel: NSObject {
                 self.directDiscountSearched = true
                 if paymentResult == nil {
                     self.initWithPaymentData = true
+                } else if paymentResult?.status == PaymentStatus.INVALID_ESC.rawValue && pm.token != nil {
+                    self.prepareForInvalidPaymentWithESC()
                 }
             }
         }
@@ -302,7 +306,7 @@ open class MercadoPagoCheckoutViewModel: NSObject {
             return .SCREEN_PAYMENT_METHOD_SELECTION
         }
 
-        if readyToPay {
+        if needToCreatePayment() {
             readyToPay = false
             return .SERVICE_POST_PAYMENT
         }
@@ -470,6 +474,7 @@ open class MercadoPagoCheckoutViewModel: NSObject {
 
     public func updateCheckoutModel(payment: Payment) {
         self.payment = payment
+        self.paymentResult = nil
     }
 
     internal func getAmount() -> Double {
@@ -632,6 +637,14 @@ extension MercadoPagoCheckoutViewModel {
 
     func cleanToken() {
         self.paymentData.token = nil
+    }
+
+    func prepareForInvalidPaymentWithESC() {
+        if self.paymentData.isComplete() {
+            readyToPay = true
+            self.savedESCCardToken = SavedESCCardToken(cardId:self.paymentData.token!.cardId, esc: nil)
+            self.paymentData.token = nil
+        }
     }
 
 }

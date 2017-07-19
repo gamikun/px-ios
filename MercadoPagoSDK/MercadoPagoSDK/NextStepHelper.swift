@@ -18,7 +18,9 @@ extension MercadoPagoCheckoutViewModel {
     }
     func isPaymentTypeSelected() -> Bool {
 
-        if self.paymentData.isComplete() && (self.search != nil) {
+        let hasPaymentWithInvalidESC = paymentData.hasPaymentMethod() && !paymentData.hasToken() && paymentResult != nil && paymentResult?.status == PaymentStatus.INVALID_ESC.rawValue
+
+        if (self.paymentData.isComplete() || hasPaymentWithInvalidESC) && (self.search != nil) {
             if self.paymentOptionSelected == nil {
                 self.setPaymentOptionSelected()
             }
@@ -111,7 +113,7 @@ extension MercadoPagoCheckoutViewModel {
         if selectedType.isCustomerPaymentMethod() {
             return false
         }
-        if paymentData.issuer == nil  && pm.isCard() && Array.isNullOrEmpty(issuers) {
+        if !paymentData.hasIssuer() && pm.isCard() && Array.isNullOrEmpty(issuers) {
             return true
         }
         return false
@@ -149,7 +151,7 @@ extension MercadoPagoCheckoutViewModel {
         guard let pm = self.paymentData.paymentMethod else {
             return false
         }
-        if pm.isCreditCard() && self.paymentData.payerCost == nil && payerCosts == nil {
+        if pm.isCreditCard() && !paymentData.hasPayerCost() && payerCosts == nil {
             return true
         }
         return false
@@ -159,7 +161,7 @@ extension MercadoPagoCheckoutViewModel {
         guard let pm = self.paymentData.paymentMethod else {
             return false
         }
-        if pm.isCreditCard() && self.paymentData.payerCost == nil && payerCosts != nil {
+        if pm.isCreditCard() && !paymentData.hasPayerCost() && payerCosts != nil {
             return true
         }
         return false
@@ -169,9 +171,16 @@ extension MercadoPagoCheckoutViewModel {
         guard let pmSelected = self.paymentOptionSelected else {
             return false
         }
-        if pmSelected.isCustomerPaymentMethod() && self.paymentData.token == nil && pmSelected.getId() != PaymentTypeId.ACCOUNT_MONEY.rawValue && (self.paymentData.payerCost != nil || !self.paymentData.paymentMethod.isCreditCard()) && !hasSavedESC() {
+        let hasInstallmentsIfNeeded = paymentData.hasPayerCost() || !self.paymentData.paymentMethod.isCreditCard()
+        let isCustomerCard = pmSelected.isCustomerPaymentMethod() && pmSelected.getId() != PaymentTypeId.ACCOUNT_MONEY.rawValue
+
+        if  isCustomerCard && !paymentData.hasToken() && hasInstallmentsIfNeeded && !hasSavedESC() {
             return true
         }
+        if self.paymentResult != nil && self.paymentResult?.status == PaymentStatus.INVALID_ESC.rawValue && !paymentData.hasToken() {
+            return true
+        }
+
         return false
     }
 
@@ -185,8 +194,8 @@ extension MercadoPagoCheckoutViewModel {
 
         let hasInstallmentsIfNeeded = self.paymentData.payerCost != nil || !self.paymentData.paymentMethod.isCreditCard()
 
-        let newCard = self.paymentData.token == nil && pm.isCard() && self.cardToken != nil
-        let savedCardWithESC = self.paymentData.token == nil && pm.isCard() && hasSavedESC() && hasInstallmentsIfNeeded
+        let newCard = !paymentData.hasToken() && pm.isCard() && self.cardToken != nil
+        let savedCardWithESC = !paymentData.hasToken() && pm.isCard() && hasSavedESC() && hasInstallmentsIfNeeded
 
         return newCard || savedCardWithESC
     }
@@ -194,6 +203,14 @@ extension MercadoPagoCheckoutViewModel {
     func needReviewAndConfirm() -> Bool {
 
         guard let _ = self.paymentOptionSelected else {
+            return false
+        }
+
+        if paymentResult != nil {
+            return false
+        }
+
+        if self.isCheckoutComplete() {
             return false
         }
 
@@ -205,14 +222,18 @@ extension MercadoPagoCheckoutViewModel {
         if paymentData.isComplete() {
             return MercadoPagoCheckoutViewModel.flowPreference.isReviewAndConfirmScreenEnable()
         }
-
         return false
     }
 
     func shouldShowCongrats() -> Bool {
+        if let paymentResult = self.paymentResult {
+            if  paymentResult.status == PaymentStatus.INVALID_ESC.rawValue {
+                return false
+            }
+        }
         if self.payment != nil || self.paymentResult != nil {
             self.setIsCheckoutComplete(isCheckoutComplete: true)
-            return true
+            return self.shouldDisplayPaymentResult()
         }
         return false
     }
@@ -225,10 +246,18 @@ extension MercadoPagoCheckoutViewModel {
         return MercadoPagoCheckoutViewModel.flowPreference.isDiscountEnable() && self.checkoutPreference != nil && !self.directDiscountSearched && self.paymentData.discount == nil && self.paymentResult == nil && !paymentData.isComplete()
     }
 
+    func needToCreatePayment() -> Bool {
+        if paymentData.isComplete() && MercadoPagoCheckoutViewModel.paymentDataConfirmCallback == nil && MercadoPagoCheckoutViewModel.paymentDataCallback == nil {
+            return readyToPay
+        }
+        return false
+    }
+
     func setPaymentOptionSelected() {
-        if self.paymentData.hasCustomerPaymentOption() && self.customPaymentOptions != nil {
+        let paymentMethodWithESC = paymentData.hasPaymentMethod() && savedESCCardToken != nil
+        if (self.paymentData.hasCustomerPaymentOption() || paymentMethodWithESC) && self.customPaymentOptions != nil {
             // Account_money o customer cards
-            let customOption = Utils.findCardInformationIn(customOptions: self.customPaymentOptions!, paymentData: self.paymentData)
+            let customOption = Utils.findCardInformationIn(customOptions: self.customPaymentOptions!, paymentData: self.paymentData, savedESCCardToken: savedESCCardToken)
             self.paymentOptionSelected = customOption as? PaymentMethodOption
         } else if !self.paymentData.paymentMethod.isOnlinePaymentMethod() {
             // Medios off
@@ -254,6 +283,9 @@ extension MercadoPagoCheckoutViewModel {
             }
 
             if !pmSelected.isCustomerPaymentMethod() {
+                return false
+            }
+            if paymentResult?.status == PaymentStatus.INVALID_ESC.rawValue {
                 return false
             }
 

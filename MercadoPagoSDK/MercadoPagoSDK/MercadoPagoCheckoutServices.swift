@@ -327,9 +327,16 @@ extension MercadoPagoCheckout {
                 }
 
                 strongSelf.dismissLoading()
-                strongSelf.viewModel.errorInputs(error: MPSDKError.convertFrom(error), errorCallback: { [weak self] (_) in
-                    self?.createPayment()
-                })
+                let mpError = MPSDKError.convertFrom(error)
+
+                if let apiException = mpError.apiException, apiException.containsCause(code: ApiUtil.ErrorCauseCodes.INVALID_PAYMENT_WITH_ESC.rawValue) {
+                    strongSelf.viewModel.prepareForInvalidPaymentWithESC()
+                } else {
+                    strongSelf.viewModel.errorInputs(error: mpError, errorCallback: { [weak self] (_) in
+                        self?.createPayment()
+                    })
+
+                }
                 strongSelf.executeNextStep()
         })
     }

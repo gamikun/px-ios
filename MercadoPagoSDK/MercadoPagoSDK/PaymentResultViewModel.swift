@@ -277,6 +277,7 @@ enum PaymentStatus: String {
     case REJECTED = "rejected"
     case RECOVERY = "recovery"
     case IN_PROCESS = "in_process"
+    case INVALID_ESC = "invalid_esc"
 }
 
 enum RejectedStatusDetail: String {

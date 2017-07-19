@@ -144,7 +144,7 @@ extension MercadoPagoCheckout {
 
                 strongSelf.viewModel.updateCheckoutModel(paymentData: paymentData)
                 if MercadoPagoCheckoutViewModel.paymentDataConfirmCallback != nil {
-                    MercadoPagoCheckoutViewModel.paymentDataConfirmCallback!(strongSelf.viewModel.paymentData)
+                    strongSelf.finish()
                 } else {
                     strongSelf.executeNextStep()
                 }
@@ -177,44 +177,38 @@ extension MercadoPagoCheckout {
         if self.viewModel.paymentResult == nil {
             self.viewModel.paymentResult = PaymentResult(payment: self.viewModel.payment!, paymentData: self.viewModel.paymentData)
         }
+        let congratsViewController: MercadoPagoUIViewController
 
-        if viewModel.shouldDisplayPaymentResult() {
+        if PaymentTypeId.isOnlineType(paymentTypeId: self.viewModel.paymentData.paymentMethod.paymentTypeId) {
+            congratsViewController = PaymentResultViewController(paymentResult: self.viewModel.paymentResult!, checkoutPreference: self.viewModel.checkoutPreference, paymentResultScreenPreference: self.viewModel.paymentResultScreenPreference, callback: { [weak self] (state: PaymentResult.CongratsState) in
 
-            let congratsViewController: MercadoPagoUIViewController
-            if PaymentTypeId.isOnlineType(paymentTypeId: self.viewModel.paymentData.paymentMethod.paymentTypeId) {
-                congratsViewController = PaymentResultViewController(paymentResult: self.viewModel.paymentResult!, checkoutPreference: self.viewModel.checkoutPreference, paymentResultScreenPreference: self.viewModel.paymentResultScreenPreference, callback: { [weak self] (state: PaymentResult.CongratsState) in
+                guard let strongSelf = self else {
+                    return
+                }
 
-                    guard let strongSelf = self else {
-                        return
-                    }
+                strongSelf.navigationController.setNavigationBarHidden(false, animated: false)
+                if state == PaymentResult.CongratsState.call_FOR_AUTH {
+                    strongSelf.viewModel.prepareForClone()
+                    strongSelf.collectSecurityCodeForRetry()
+                } else if state == PaymentResult.CongratsState.cancel_RETRY || state == PaymentResult.CongratsState.cancel_SELECT_OTHER {
+                    strongSelf.viewModel.prepareForNewSelection()
+                    strongSelf.executeNextStep()
 
-                    strongSelf.navigationController.setNavigationBarHidden(false, animated: false)
-                    if state == PaymentResult.CongratsState.call_FOR_AUTH {
-                        strongSelf.viewModel.prepareForClone()
-                        strongSelf.collectSecurityCodeForRetry()
-                    } else if state == PaymentResult.CongratsState.cancel_RETRY || state == PaymentResult.CongratsState.cancel_SELECT_OTHER {
-                        strongSelf.viewModel.prepareForNewSelection()
-                        strongSelf.executeNextStep()
-
-                    } else {
-                        strongSelf.finish()
-                    }
-
-                })
-            } else {
-                congratsViewController = InstructionsViewController(paymentResult: self.viewModel.paymentResult!, callback: { [weak self] (_ :PaymentResult.CongratsState) in
-                    guard let strongSelf = self else {
-                        return
-                    }
-                    strongSelf.navigationController.setNavigationBarHidden(false, animated: false)
+                } else {
                     strongSelf.finish()
-                    }, paymentResultScreenPreference: self.viewModel.paymentResultScreenPreference)
-            }
-            self.pushViewController(viewController : congratsViewController, animated: true)
+                }
 
+            })
         } else {
-            finish()
+            congratsViewController = InstructionsViewController(paymentResult: self.viewModel.paymentResult!, callback: { [weak self] (_ :PaymentResult.CongratsState) in
+                guard let strongSelf = self else {
+                    return
+                }
+                strongSelf.navigationController.setNavigationBarHidden(false, animated: false)
+                strongSelf.finish()
+                }, paymentResultScreenPreference: self.viewModel.paymentResultScreenPreference)
         }
+        self.pushViewController(viewController : congratsViewController, animated: true)
     }
 
     func showErrorScreen() {

@@ -220,7 +220,10 @@ class MainTableViewController: UITableViewController {
         if setPaymentDataConfirmCallback {
             MercadoPagoCheckout.setPaymentDataConfirmCallback { (PaymentData) in
                 self.paymentData = PaymentData
-                self.buttonViewControllerCreator(title: "Ir a Congrats", walletStep: walletSteps.congrats)
+                let paymentResult = PaymentResult(status: "invalid_esc", statusDetail: "", paymentData: self.paymentData, payerEmail: "sfsd@gs.com", id: nil, statementDescription: nil)
+                let checkout = MercadoPagoCheckout(publicKey: self.publicKey, accessToken: accessToken , checkoutPreference: pref!, paymentData: self.paymentData, paymentResult: paymentResult, navigationController: self.navigationController!)
+                checkout.start()
+                //self.buttonViewControllerCreator(title: "Ir a Congrats", walletStep: walletSteps.congrats)
             }
         }
 
