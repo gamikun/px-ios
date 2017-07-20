@@ -6,7 +6,12 @@
 //  Copyright © 2016 MercadoPago. All rights reserved.
 //
 
+
 import UIKit
+
+#if MPESC_ENABLE
+    import ESCManager
+#endif
 
 open class CustomerPaymentMethod: NSObject, CardInformation, PaymentMethodOption {
 
@@ -124,6 +129,21 @@ open class CustomerPaymentMethod: NSObject, CardInformation, PaymentMethodOption
         return false
     }
 
+    public func getESC() -> String? {
+        if MercadoPagoCheckout.hasESCEnable() {
+           /* #if MPESC_ENABLE
+                return !String.isNullOrEmpty(ESCManager.getESC(cardId: getCardId()))
+            #endif*/
+
+            if getCardId() == "132797406" {
+                return MercadoPagoCheckoutViewModel.esc
+             } else {
+                return nil
+             }
+        }
+        return nil
+    }
+
     /** PaymentOptionDrawable implementation */
 
     public func getTitle() -> String {
@@ -172,5 +192,4 @@ open class CustomerPaymentMethod: NSObject, CardInformation, PaymentMethodOption
     public func canBeClone() -> Bool {
         return false
     }
-
 }

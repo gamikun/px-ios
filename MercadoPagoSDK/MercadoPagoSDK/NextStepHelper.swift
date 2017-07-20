@@ -177,9 +177,6 @@ extension MercadoPagoCheckoutViewModel {
         if  isCustomerCard && !paymentData.hasToken() && hasInstallmentsIfNeeded && !hasSavedESC() {
             return true
         }
-        if self.paymentResult != nil && self.paymentResult?.status == PaymentStatus.INVALID_ESC.rawValue && !paymentData.hasToken() {
-            return true
-        }
 
         return false
     }
@@ -277,46 +274,13 @@ extension MercadoPagoCheckoutViewModel {
     }
 
     func hasSavedESC() -> Bool {
-        if hasESCEnable() {
-            guard let pmSelected = self.paymentOptionSelected else {
-                return false
-            }
-
-            if !pmSelected.isCustomerPaymentMethod() {
-                return false
-            }
-            if paymentResult?.status == PaymentStatus.INVALID_ESC.rawValue {
-                return false
-            }
-
-            if let card = pmSelected as? CardInformation {
-                if card.getCardId() == "132797406" {
-                    return esc == nil ? false : true
-                } else {
-                    return false
-                }
-                //return //!String.isNullOrEmpty(ESCManager.getESC(cardId: card.getCardId()))
-            }
-            return false
-
-        } else {
+        guard let pmSelected = self.paymentOptionSelected else {
             return false
         }
-    }
 
-    func getESC() -> String? {
-        if hasESCEnable() {
-            return esc
+        if let card = pmSelected as? CardInformation {
+            return card.getESC() == nil ? false : true
         }
-
-        return nil
-    }
-
-    func hasESCEnable() -> Bool {
-        #if MPESC_ENABLE
-            return MercadoPagoCheckoutViewModel.flowPreference.isESCEnable()
-        #else
-            return false
-        #endif
+        return false
     }
 }

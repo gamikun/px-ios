@@ -85,21 +85,11 @@ open class MercadoPagoCheckoutViewModel: NSObject {
     var savedESCCardToken: SavedESCCardToken?
     private var checkoutComplete = false
 
-    public var esc: String? = "111" // sacar esta variable
-
-    static internal func clearEnviroment() {
-        MercadoPagoCheckoutViewModel.servicePreference = ServicePreference()
-        MercadoPagoCheckoutViewModel.decorationPreference = DecorationPreference()
-        MercadoPagoCheckoutViewModel.flowPreference = FlowPreference()
-
-        MercadoPagoCheckoutViewModel.paymentDataCallback = nil
-        MercadoPagoCheckoutViewModel.paymentDataConfirmCallback = nil
-        MercadoPagoCheckoutViewModel.paymentCallback = nil
-        MercadoPagoCheckoutViewModel.changePaymentMethodCallback = nil
-    }
+    public static var esc: String? = "111" // sacar esta variable
 
     init(checkoutPreference: CheckoutPreference, paymentData: PaymentData?, paymentResult: PaymentResult?, discount: DiscountCoupon?) {
         super.init()
+        MercadoPagoCheckoutViewModel.esc = "111"
         self.checkoutPreference = checkoutPreference
         if let pm = paymentData {
             if pm.isComplete() {
@@ -629,7 +619,7 @@ extension MercadoPagoCheckoutViewModel {
     }
 
     func prepareForNewSelection() {
-           self.setIsCheckoutComplete(isCheckoutComplete: false)
+        self.setIsCheckoutComplete(isCheckoutComplete: false)
         self.cleanPaymentResult()
         self.resetInformation()
         self.resetGroupSelection()
@@ -644,7 +634,19 @@ extension MercadoPagoCheckoutViewModel {
             readyToPay = true
             self.savedESCCardToken = SavedESCCardToken(cardId:self.paymentData.token!.cardId, esc: nil)
             self.paymentData.token = nil
+            // Borrar token
         }
+    }
+
+    static internal func clearEnviroment() {
+        MercadoPagoCheckoutViewModel.servicePreference = ServicePreference()
+        MercadoPagoCheckoutViewModel.decorationPreference = DecorationPreference()
+        MercadoPagoCheckoutViewModel.flowPreference = FlowPreference()
+
+        MercadoPagoCheckoutViewModel.paymentDataCallback = nil
+        MercadoPagoCheckoutViewModel.paymentDataConfirmCallback = nil
+        MercadoPagoCheckoutViewModel.paymentCallback = nil
+        MercadoPagoCheckoutViewModel.changePaymentMethodCallback = nil
     }
 
 }

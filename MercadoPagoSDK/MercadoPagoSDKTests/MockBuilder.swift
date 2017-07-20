@@ -316,6 +316,13 @@ open class MockBuilder: NSObject {
         return customOption
     }
 
+    class func buildCustomerPaymentMethodWithESC(_ id: String, paymentMethodId: String) -> CardInformation {
+        let customOption = CardInformationESCMock()
+        customOption._id = id
+        customOption.paymentMethodId = paymentMethodId
+        return customOption
+    }
+
     class func buildPaymentData(paymentMethod: PaymentMethod) -> PaymentData {
         let paymentData = PaymentData()
         paymentData.paymentMethod = paymentMethod
@@ -416,4 +423,16 @@ open class MockBuilder: NSObject {
         return apiException
     }
 
+    class func buildFlowPreferenceWithoutESC() -> FlowPreference {
+        let flowPreference = FlowPreference()
+        flowPreference.disableESC()
+        return flowPreference
+    }
+
+}
+
+class CardInformationESCMock : CustomerPaymentMethod {
+    override func getESC() -> String? {
+        return "111"
+    }
 }

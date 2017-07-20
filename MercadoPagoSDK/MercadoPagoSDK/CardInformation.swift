@@ -31,6 +31,8 @@ public protocol CardInformation: CardInformationForm, PaymentOptionDrawable {
 
     func getFirstSixDigits() -> String!
 
+    func getESC() -> String?
+
 }
 @objc
 

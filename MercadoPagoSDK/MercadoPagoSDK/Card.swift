@@ -156,6 +156,10 @@ open class Card: NSObject, CardInformation, PaymentMethodOption {
         return false
     }
 
+    public func getESC() -> String? {
+        return nil
+    }
+
     /** PaymentOptionDrawable implementation */
 
     public func getTitle() -> String {

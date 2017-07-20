@@ -19,7 +19,7 @@ open class SavedCardToken: CardToken {
         self.securityCode = securityCode
     }
 
-    fileprivate init(cardId: String) {
+    internal init(cardId: String) {
         self.cardId = cardId
         super.init()
         self.device = Device()
@@ -61,34 +61,5 @@ open class SavedCardToken: CardToken {
 
     open override func toJSONString() -> String {
         return JSONHandler.jsonCoding(toJSON())
-    }
-}
-
-open class SavedESCCardToken: SavedCardToken {
-    open var requireESC = MercadoPagoCheckoutViewModel.flowPreference.saveESC
-    open var esc: String?
-
-    init (cardId: String, securityCode: String?, requireESC: Bool = true) {
-        super.init(cardId: cardId)
-        self.securityCode = securityCode
-        self.cardId = cardId
-        self.requireESC = requireESC
-        self.device = Device()
-    }
-
-    init (cardId: String, esc: String?, requireESC: Bool = true) {
-        super.init(cardId: cardId)
-        self.securityCode = ""
-        self.cardId = cardId
-        self.requireESC = requireESC
-        self.esc = esc
-        self.device = Device()
-    }
-
-    open override func toJSON() -> [String:Any] {
-        var obj = super.toJSON()
-        obj["require_esc"] = MercadoPagoCheckoutViewModel.flowPreference.saveESC
-        obj["esc"] = String.isNullOrEmpty(self.esc) ? JSONHandler.null : self.esc!
-        return obj
     }
 }
