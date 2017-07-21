@@ -23,13 +23,7 @@ open class FlowPreference: NSObject {
     var showAllSavedCards = false
     var showInstallmentsReviewScreen = true
     var maxSavedCardsToShow = FlowPreference.DEFAULT_MAX_SAVED_CARDS_TO_SHOW
-
-    // Poner en true por default
-    #if MPESC_ENABLE
-        var saveESC = true
-    #else
-        var saveESC = false
-    #endif
+    var saveESC = false
 
     public func disableReviewAndConfirmScreen() {
         showReviewAndConfirmScreen = false

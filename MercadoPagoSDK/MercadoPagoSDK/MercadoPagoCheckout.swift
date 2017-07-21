@@ -220,13 +220,4 @@ open class MercadoPagoCheckout: NSObject {
         }
         self.navigationController.viewControllers = currentViewControllers
     }
-
-    static func hasESCEnable() -> Bool {
-        /*#if MPESC_ENABLE
-            return MercadoPagoCheckoutViewModel.flowPreference.isESCEnable()
-        #else
-            return false
-        #endif*/
-        return true
-    }
 }

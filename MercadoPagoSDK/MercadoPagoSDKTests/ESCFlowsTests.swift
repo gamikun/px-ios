@@ -10,17 +10,22 @@ import XCTest
 
 class ESCFlowsTests: BaseTest {
 
+    var mpCheckout: MercadoPagoCheckout!
     override func setUp() {
         super.setUp()
-        MercadoPagoCheckout.setFlowPreference(FlowPreference())
+
+        let flowPreference = FlowPreference()
+        flowPreference.enableESC()
+
+        MercadoPagoCheckout.setFlowPreference(flowPreference)
+
+        let checkoutPreference = MockBuilder.buildCheckoutPreference()
+        mpCheckout = MercadoPagoCheckout(publicKey: "public_key", accessToken: "access_token", checkoutPreference: checkoutPreference, navigationController: UINavigationController())
+        mpCheckout.viewModel.mpESCManager = MercadoPagoESCImplementationTest()
     }
 
     func testEntireFlowWithCustomerCardWithESCNoError() {
-        // Set access_token
 
-        let checkoutPreference = MockBuilder.buildCheckoutPreference()
-
-        let mpCheckout = MercadoPagoCheckout(publicKey: "public_key", accessToken: "access_token", checkoutPreference: checkoutPreference, navigationController: UINavigationController())
         XCTAssertNotNil(mpCheckout.viewModel)
 
         // 1. Search preference
@@ -41,7 +46,7 @@ class ESCFlowsTests: BaseTest {
         MPCheckoutTestAction.loadGroupsInViewModel(mpCheckout: mpCheckout)
 
         // Simular api call a grupos
-        let customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC("customerCardId", paymentMethodId: "visa")
+        let customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC(paymentMethodId: "visa")
         let creditCardOption = MockBuilder.buildPaymentMethodSearchItem("credit_card", type: PaymentMethodSearchItemType.PAYMENT_TYPE)
         let paymentMethodVisa = MockBuilder.buildPaymentMethod("visa")
         let paymentMethodSearchMock = MockBuilder.buildPaymentMethodSearch(groups : [creditCardOption], paymentMethods : [paymentMethodVisa], customOptions : [customerCardOption])
@@ -101,12 +106,6 @@ class ESCFlowsTests: BaseTest {
     }
 
     func testEntireFlowWithCustomerCardWithESErrorInTokenCreation() {
-
-        // Set access_token
-
-        let checkoutPreference = MockBuilder.buildCheckoutPreference()
-
-        let mpCheckout = MercadoPagoCheckout(publicKey: "public_key", accessToken: "access_token", checkoutPreference: checkoutPreference, navigationController: UINavigationController())
         XCTAssertNotNil(mpCheckout.viewModel)
 
         // 1. Search preference
@@ -127,7 +126,7 @@ class ESCFlowsTests: BaseTest {
         MPCheckoutTestAction.loadGroupsInViewModel(mpCheckout: mpCheckout)
 
         // Simular api call a grupos
-        var customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC("customerCardId", paymentMethodId: "visa")
+        var customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC(paymentMethodId: "visa")
         let creditCardOption = MockBuilder.buildPaymentMethodSearchItem("credit_card", type: PaymentMethodSearchItemType.PAYMENT_TYPE)
         let paymentMethodVisa = MockBuilder.buildPaymentMethod("visa")
         let paymentMethodSearchMock = MockBuilder.buildPaymentMethodSearch(groups : [creditCardOption], paymentMethods : [paymentMethodVisa], customOptions : [customerCardOption])
@@ -196,11 +195,6 @@ class ESCFlowsTests: BaseTest {
 
     func testEntireFlowWithCustomerCardWithESErrorInPaymentAndInTokenCreation() {
 
-        // Set access_token
-
-        let checkoutPreference = MockBuilder.buildCheckoutPreference()
-
-        let mpCheckout = MercadoPagoCheckout(publicKey: "public_key", accessToken: "access_token", checkoutPreference: checkoutPreference, navigationController: UINavigationController())
         XCTAssertNotNil(mpCheckout.viewModel)
 
         // 1. Search preference
@@ -221,7 +215,7 @@ class ESCFlowsTests: BaseTest {
         MPCheckoutTestAction.loadGroupsInViewModel(mpCheckout: mpCheckout)
 
         // Simular api call a grupos
-        var customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC("customerCardId", paymentMethodId: "visa")
+        var customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC(paymentMethodId: "visa")
         let creditCardOption = MockBuilder.buildPaymentMethodSearchItem("credit_card", type: PaymentMethodSearchItemType.PAYMENT_TYPE)
         let paymentMethodVisa = MockBuilder.buildPaymentMethod("visa")
         let paymentMethodSearchMock = MockBuilder.buildPaymentMethodSearch(groups : [creditCardOption], paymentMethods : [paymentMethodVisa], customOptions : [customerCardOption])
@@ -310,13 +304,6 @@ class ESCFlowsTests: BaseTest {
 
     func testEntireFlowWithCustomerCardWithESErrorInPayment() {
 
-        // Set access_token
-
-        let checkoutPreference = MockBuilder.buildCheckoutPreference()
-
-        MercadoPagoCheckout.setFlowPreference(FlowPreference())
-
-        let mpCheckout = MercadoPagoCheckout(publicKey: "public_key", accessToken: "access_token", checkoutPreference: checkoutPreference, navigationController: UINavigationController())
         XCTAssertNotNil(mpCheckout.viewModel)
 
         // 1. Search preference
@@ -337,7 +324,7 @@ class ESCFlowsTests: BaseTest {
         MPCheckoutTestAction.loadGroupsInViewModel(mpCheckout: mpCheckout)
 
         // Simular api call a grupos
-        var customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC("customerCardId", paymentMethodId: "visa")
+        var customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC(paymentMethodId: "visa")
         let creditCardOption = MockBuilder.buildPaymentMethodSearchItem("credit_card", type: PaymentMethodSearchItemType.PAYMENT_TYPE)
         let paymentMethodVisa = MockBuilder.buildPaymentMethod("visa")
         let paymentMethodSearchMock = MockBuilder.buildPaymentMethodSearch(groups : [creditCardOption], paymentMethods : [paymentMethodVisa], customOptions : [customerCardOption])
@@ -418,16 +405,11 @@ class ESCFlowsTests: BaseTest {
         mpCheckout.executeNextStep()
     }
 
-    func testEntireFlowWithCustomerCardWithESCNoErrorFlowPreferenceDisable() { // Falla porque mockee el hasEnableESC
-
-        /*// Set access_token
-
-        let checkoutPreference = MockBuilder.buildCheckoutPreference()
+    func testEntireFlowWithCustomerCardWithESCNoErrorFlowPreferenceDisable() {
 
         let flowPreference = MockBuilder.buildFlowPreferenceWithoutESC()
         MercadoPagoCheckout.setFlowPreference(flowPreference)
 
-        let mpCheckout = MercadoPagoCheckout(publicKey: "public_key", accessToken: "access_token", checkoutPreference: checkoutPreference, navigationController: UINavigationController())
         XCTAssertNotNil(mpCheckout.viewModel)
 
         // 1. Search preference
@@ -448,7 +430,7 @@ class ESCFlowsTests: BaseTest {
         MPCheckoutTestAction.loadGroupsInViewModel(mpCheckout: mpCheckout)
 
         // Simular api call a grupos
-        var customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC("customerCardId", paymentMethodId: "visa")
+        var customerCardOption = MockBuilder.buildCustomerPaymentMethodWithESC(paymentMethodId: "visa")
         let creditCardOption = MockBuilder.buildPaymentMethodSearchItem("credit_card", type: PaymentMethodSearchItemType.PAYMENT_TYPE)
         let paymentMethodVisa = MockBuilder.buildPaymentMethod("visa")
         let paymentMethodSearchMock = MockBuilder.buildPaymentMethodSearch(groups : [creditCardOption], paymentMethods : [paymentMethodVisa], customOptions : [customerCardOption])
@@ -504,8 +486,36 @@ class ESCFlowsTests: BaseTest {
         XCTAssertEqual(CheckoutStep.ACTION_FINISH, step)
         
         // Ejecutar finish
-        mpCheckout.executeNextStep()*/
+        mpCheckout.executeNextStep()
     }
 
 }
+open class MercadoPagoESCImplementationTest: NSObject, MercadoPagoESC {
+
+    public func hasESCEnable() -> Bool {
+        return MercadoPagoCheckoutViewModel.flowPreference.isESCEnable()
+    }
+
+    public func getESC(cardId: String) -> String? {
+        if hasESCEnable() {
+            if cardId == "esc" {
+                return "111"
+            }
+        }
+        return nil
+    }
+
+    public func saveESC(cardId: String, esc: String) -> Bool {
+        return true
+    }
+
+    public func deleteESC(cardId: String) {
+
+    }
+
+    public func deleteAllESC() {
+
+    }
+}
+
 

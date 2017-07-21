@@ -7,9 +7,6 @@
 //
 
 import Foundation
-#if MPESC_ENABLE
-    import ESCManager
-#endif
 
 extension MercadoPagoCheckoutViewModel {
 
@@ -279,7 +276,7 @@ extension MercadoPagoCheckoutViewModel {
         }
 
         if let card = pmSelected as? CardInformation {
-            return card.getESC() == nil ? false : true
+            return mpESCManager.getESC(cardId: card.getCardId()) == nil ? false : true
         }
         return false
     }

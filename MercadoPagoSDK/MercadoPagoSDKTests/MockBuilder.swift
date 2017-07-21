@@ -316,9 +316,9 @@ open class MockBuilder: NSObject {
         return customOption
     }
 
-    class func buildCustomerPaymentMethodWithESC(_ id: String, paymentMethodId: String) -> CardInformation {
-        let customOption = CardInformationESCMock()
-        customOption._id = id
+    class func buildCustomerPaymentMethodWithESC(paymentMethodId: String) -> CardInformation {
+        let customOption = CustomerPaymentMethod()
+        customOption._id = "esc"
         customOption.paymentMethodId = paymentMethodId
         return customOption
     }
@@ -431,8 +431,3 @@ open class MockBuilder: NSObject {
 
 }
 
-class CardInformationESCMock : CustomerPaymentMethod {
-    override func getESC() -> String? {
-        return "111"
-    }
-}

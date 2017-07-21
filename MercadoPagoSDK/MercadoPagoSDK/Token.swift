@@ -179,6 +179,10 @@ open class Token: NSObject, CardInformationForm {
     public func hasESC() -> Bool {
         return !String.isNullOrEmpty(esc)
     }
+
+    public func hasCardId() -> Bool {
+        return !String.isNullOrEmpty(cardId)
+    }
 }
 
 extension NSDictionary {

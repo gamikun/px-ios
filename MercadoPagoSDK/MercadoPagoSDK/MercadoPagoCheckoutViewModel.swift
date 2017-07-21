@@ -8,9 +8,6 @@
 
 import UIKit
 
-#if MPESC_ENABLE
-    import ESCManager
-#endif
 
 public enum CheckoutStep: String {
     case ACTION_FINISH
@@ -89,11 +86,11 @@ open class MercadoPagoCheckoutViewModel: NSObject {
     var savedESCCardToken: SavedESCCardToken?
     private var checkoutComplete = false
 
-    public static var esc: String? = "111" // sacar esta variable
+
+    var mpESCManager: MercadoPagoESC = MercadoPagoESCImplementation()
 
     init(checkoutPreference: CheckoutPreference, paymentData: PaymentData?, paymentResult: PaymentResult?, discount: DiscountCoupon?) {
         super.init()
-        MercadoPagoCheckoutViewModel.esc = "111"
         self.checkoutPreference = checkoutPreference
         if let pm = paymentData {
             if pm.isComplete() {
@@ -597,14 +594,15 @@ open class MercadoPagoCheckoutViewModel: NSObject {
     }
 
     func saveOrDeleteESC() {
-        if MercadoPagoCheckout.hasESCEnable() && !String.isNullOrEmpty(paymentResult?.paymentData?.token?.cardId) {
-            #if MPESC_ENABLE
-                if self.paymentResult?.isApproved() && paymentResult.paymentData.hasESC {
-                    ESCManager.saveESC(cardId: paymentResult.paymentData.token.cardId, esc: paymentResult.paymentData.token.esc)
-                } else {
-                    ESCManager.deleteESC(cardId: paymentResult.paymentData.token.cardId)
-                }
-            #endif
+        guard  let paymetResult = self.paymentResult, let token = paymentResult?.paymentData?.token else {
+            return
+        }
+        if token.hasCardId() {
+            if paymetResult.isApproved() && token.hasESC() {
+                mpESCManager.saveESC(cardId: token.cardId, esc: token.esc!)
+            } else {
+                mpESCManager.deleteESC(cardId: token.cardId)
+            }
         }
     }
 
@@ -655,14 +653,10 @@ extension MercadoPagoCheckoutViewModel {
         if self.paymentData.isComplete() {
             readyToPay = true
             self.savedESCCardToken = SavedESCCardToken(cardId: self.paymentData.token!.cardId, esc: nil)
-            if MercadoPagoCheckout.hasESCEnable() {
-                #if MPESC_ENABLE
-                    ESCManager.deleteESC(cardId: self.paymentData.token!.cardId)
-                #endif
-            }
-
-            self.paymentData.token = nil
+            mpESCManager.deleteESC(cardId: self.paymentData.token!.cardId)
         }
+
+        self.paymentData.token = nil
     }
 
     static internal func clearEnviroment() {

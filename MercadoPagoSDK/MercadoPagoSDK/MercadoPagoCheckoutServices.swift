@@ -125,11 +125,13 @@ extension MercadoPagoCheckout {
             }
             cloneCardToken(token: token, securityCode: securityCode!)
 
-        } else if MercadoPagoCheckout.hasESCEnable() {
+        } else if self.viewModel.mpESCManager.hasESCEnable() {
             var savedESCCardToken: SavedESCCardToken
 
-            if cardInfo.getESC() != nil {
-                savedESCCardToken = SavedESCCardToken(cardId: cardInfo.getCardId(), esc: cardInfo.getESC()!)
+            let esc = self.viewModel.mpESCManager.getESC(cardId: cardInfo.getCardId())
+
+            if !String.isNullOrEmpty(esc) {
+                savedESCCardToken = SavedESCCardToken(cardId: cardInfo.getCardId(), esc: esc)
             } else {
                 savedESCCardToken = SavedESCCardToken(cardId: cardInfo.getCardId(), securityCode: securityCode)
             }
@@ -225,7 +227,9 @@ extension MercadoPagoCheckout {
                 let mpError = MPSDKError.convertFrom(error)
 
                 if let apiException = mpError.apiException, apiException.containsCause(code: ApiUtil.ErrorCauseCodes.INVALID_ESC.rawValue) ||  apiException.containsCause(code: ApiUtil.ErrorCauseCodes.INVALID_FINGERPRINT.rawValue) {
-                    MercadoPagoCheckoutViewModel.esc = nil
+
+                    strongSelf.viewModel.mpESCManager.deleteESC(cardId: savedESCCardToken.cardId)
+
                 } else {
                     strongSelf.viewModel.errorInputs(error: mpError, errorCallback: { [weak self] (_) in
                         self?.createSavedESCCardToken(savedESCCardToken: savedESCCardToken)
