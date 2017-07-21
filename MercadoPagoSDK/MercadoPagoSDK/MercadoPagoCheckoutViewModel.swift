@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 public enum CheckoutStep: String {
     case ACTION_FINISH
     case ACTION_VALIDATE_PREFERENCE
@@ -85,7 +84,6 @@ open class MercadoPagoCheckoutViewModel: NSObject {
     var directDiscountSearched = false
     var savedESCCardToken: SavedESCCardToken?
     private var checkoutComplete = false
-
 
     var mpESCManager: MercadoPagoESC = MercadoPagoESCImplementation()
 
