@@ -1,6 +1,6 @@
 PODS:
   - ESCManager (1.0.0)
-  - MercadoPagoSDK/ESC (3.2.1):
+  - MercadoPagoSDK/ESC (3.2.2):
     - ESCManager
 
 DEPENDENCIES:
@@ -12,7 +12,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   ESCManager: cd926c25d31629ae3182d8bf97d804ceb7b2a65a
-  MercadoPagoSDK: 857836818f78e83fafdac72adfb3dd3f53eff3c4
+  MercadoPagoSDK: 6cb6bec1555a4719198ba5a9230e13554f2094fb
 
 PODFILE CHECKSUM: d1bbb0fef24d9bb1c8d79a95970978a05411b2ec
 
