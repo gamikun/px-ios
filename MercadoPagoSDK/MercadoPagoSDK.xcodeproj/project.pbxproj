@@ -243,6 +243,7 @@
 		4B08CDA01F21A06600FE800A /* SavedESCCardTokenTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B08CD9F1F21A06600FE800A /* SavedESCCardTokenTest.swift */; };
 		4B0BAC421F1E81BF0097103E /* MercadoPagoCheckoutServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD84D711F1E48FB002219D4 /* MercadoPagoCheckoutServices.swift */; };
 		4B0BAC431F1E81C60097103E /* MercadoPagoCheckoutScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD84D731F1E4910002219D4 /* MercadoPagoCheckoutScreens.swift */; };
+		4B08CDA41F2229E400FE800A /* PaymentDataTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B08CDA31F2229E400FE800A /* PaymentDataTest.swift */; };
 		4B277F661E38DD7700AF5DF8 /* NSDictionary+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B277F651E38DD7700AF5DF8 /* NSDictionary+Additions.swift */; };
 		4B277F671E38DD7700AF5DF8 /* NSDictionary+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B277F651E38DD7700AF5DF8 /* NSDictionary+Additions.swift */; };
 		4B277F691E38F00D00AF5DF8 /* ServicePreferenceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B277F681E38F00D00AF5DF8 /* ServicePreferenceTest.swift */; };
@@ -733,6 +734,7 @@
 		4B08CD9A1F20E2B400FE800A /* ESCFlowsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ESCFlowsTests.swift; sourceTree = "<group>"; };
 		4B08CD9C1F20F66700FE800A /* SavedESCCardToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SavedESCCardToken.swift; sourceTree = "<group>"; };
 		4B08CD9F1F21A06600FE800A /* SavedESCCardTokenTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SavedESCCardTokenTest.swift; sourceTree = "<group>"; };
+		4B08CDA31F2229E400FE800A /* PaymentDataTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentDataTest.swift; sourceTree = "<group>"; };
 		4B241A991E01A7E00059640C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4B277F651E38DD7700AF5DF8 /* NSDictionary+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDictionary+Additions.swift"; sourceTree = "<group>"; };
 		4B277F681E38F00D00AF5DF8 /* ServicePreferenceTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServicePreferenceTest.swift; sourceTree = "<group>"; };
@@ -1714,6 +1716,7 @@
 				4B077D4A1EB4400E001B0D69 /* PaymentResultContentViewTest.swift */,
 				236251CB1EF2D518005589AB /* PaymentResultTest.swift */,
 				4B08CD9F1F21A06600FE800A /* SavedESCCardTokenTest.swift */,
+				4B08CDA31F2229E400FE800A /* PaymentDataTest.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -2553,6 +2556,7 @@
 				76D00A011CA2CA3E00F52BC6 /* UtilsTest.swift in Sources */,
 				0F9883581AD2AB6000F750F0 /* Address.swift in Sources */,
 				76D936421CDA5BE000238CB0 /* PreferenceService.swift in Sources */,
+				4B08CDA41F2229E400FE800A /* PaymentDataTest.swift in Sources */,
 				23ECADC61EF1D7E0003E4539 /* ApiUtil.swift in Sources */,
 				0F9883BF1AD2AD1600F750F0 /* UIColor+Additions.swift in Sources */,
 				15F7F8C01F0D34140093E2F9 /* TrackingStrategy.swift in Sources */,

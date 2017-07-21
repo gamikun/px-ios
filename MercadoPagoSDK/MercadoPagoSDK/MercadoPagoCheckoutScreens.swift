@@ -177,6 +177,9 @@ extension MercadoPagoCheckout {
         if self.viewModel.paymentResult == nil {
             self.viewModel.paymentResult = PaymentResult(payment: self.viewModel.payment!, paymentData: self.viewModel.paymentData)
         }
+
+       self.viewModel.saveOrDeleteESC()
+
         let congratsViewController: MercadoPagoUIViewController
 
         if PaymentTypeId.isOnlineType(paymentTypeId: self.viewModel.paymentData.paymentMethod.paymentTypeId) {

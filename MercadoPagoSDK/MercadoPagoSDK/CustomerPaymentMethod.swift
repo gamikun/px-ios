@@ -131,15 +131,17 @@ open class CustomerPaymentMethod: NSObject, CardInformation, PaymentMethodOption
 
     public func getESC() -> String? {
         if MercadoPagoCheckout.hasESCEnable() {
-           /* #if MPESC_ENABLE
+           #if MPESC_ENABLE
                 return !String.isNullOrEmpty(ESCManager.getESC(cardId: getCardId()))
-            #endif*/
+            #endif
 
+            // Mocked
+            /*
             if getCardId() == "132797406" {
                 return MercadoPagoCheckoutViewModel.esc
              } else {
                 return nil
-             }
+             }*/
         }
         return nil
     }

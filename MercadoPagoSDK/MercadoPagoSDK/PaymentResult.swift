@@ -42,4 +42,24 @@ open class PaymentResult: NSObject {
         self._id = id
         self.statementDescription = statementDescription
     }
+
+    func isCallForAuth() -> Bool {
+        return self.statusDetail == "cc_rejected_call_for_authorize"
+    }
+
+    func isApproved() -> Bool {
+        return self.status == PaymentStatus.APPROVED.rawValue
+    }
+
+    func isPending() -> Bool {
+        return self.status == PaymentStatus.IN_PROCESS.rawValue
+    }
+
+    func isRejected() -> Bool {
+        return self.status == PaymentStatus.REJECTED.rawValue
+    }
+
+    func isInvalidESC() -> Bool {
+        return self.status == PaymentStatus.INVALID_ESC.rawValue
+    }
 }

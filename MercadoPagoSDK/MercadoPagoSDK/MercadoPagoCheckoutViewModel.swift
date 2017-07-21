@@ -8,6 +8,10 @@
 
 import UIKit
 
+#if MPESC_ENABLE
+    import ESCManager
+#endif
+
 public enum CheckoutStep: String {
     case ACTION_FINISH
     case ACTION_VALIDATE_PREFERENCE
@@ -97,18 +101,24 @@ open class MercadoPagoCheckoutViewModel: NSObject {
                 self.directDiscountSearched = true
                 if paymentResult == nil {
                     self.initWithPaymentData = true
-                } else if paymentResult?.status == PaymentStatus.INVALID_ESC.rawValue && pm.token != nil {
-                    self.prepareForInvalidPaymentWithESC()
+                } else {
+
+                    if paymentResult!.paymentData != nil && paymentResult!.paymentData!.isComplete() {
+                        self.paymentData = paymentResult!.paymentData!
+                    }
+                    if paymentResult?.status == PaymentStatus.INVALID_ESC.rawValue && pm.token != nil {
+                        self.prepareForInvalidPaymentWithESC()
+                    }
                 }
             }
         }
+        self.paymentResult = paymentResult
         if let discount = discount {
             if paymentData == nil {
                 self.paymentData = PaymentData()
             }
             self.paymentData.discount = discount
         }
-        self.paymentResult = paymentResult
         if !String.isNullOrEmpty(self.checkoutPreference._id) {
             needLoadPreference = true
         } else {
@@ -586,6 +596,18 @@ open class MercadoPagoCheckoutViewModel: NSObject {
         return true
     }
 
+    func saveOrDeleteESC() {
+        if MercadoPagoCheckout.hasESCEnable() && !String.isNullOrEmpty(paymentResult?.paymentData?.token?.cardId) {
+            #if MPESC_ENABLE
+                if self.paymentResult?.isApproved() && paymentResult.paymentData.hasESC {
+                    ESCManager.saveESC(cardId: paymentResult.paymentData.token.cardId, esc: paymentResult.paymentData.token.esc)
+                } else {
+                    ESCManager.deleteESC(cardId: paymentResult.paymentData.token.cardId)
+                }
+            #endif
+        }
+    }
+
 }
 
 extension MercadoPagoCheckoutViewModel {
@@ -632,9 +654,14 @@ extension MercadoPagoCheckoutViewModel {
     func prepareForInvalidPaymentWithESC() {
         if self.paymentData.isComplete() {
             readyToPay = true
-            self.savedESCCardToken = SavedESCCardToken(cardId:self.paymentData.token!.cardId, esc: nil)
+            self.savedESCCardToken = SavedESCCardToken(cardId: self.paymentData.token!.cardId, esc: nil)
+            if MercadoPagoCheckout.hasESCEnable() {
+                #if MPESC_ENABLE
+                    ESCManager.deleteESC(cardId: self.paymentData.token!.cardId)
+                #endif
+            }
+
             self.paymentData.token = nil
-            // Borrar token
         }
     }
 
