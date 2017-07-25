@@ -25,6 +25,10 @@ class ConfirmEmailTableViewCell: UITableViewCell {
             } else {
                 label.text = "También enviamos el código a tu email".localized
             }
+        } else {
+            if let email = payment.payer?.email {
+                label.text = "Enviado al correo \(email)"
+            }
         }
     }
 }
